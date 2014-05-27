@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # The MIT License (MIT)
 
 # Copyright (c) 2014 glframebuffer
@@ -21,41 +23,43 @@
 
 # This script allows Beaglebone white or black to shutdoen after 5 Minutes
 
-#!/bin/bash
+
+
 NEW_NUM=false
 PWR_NUM=0
 PWR_COUNT=0
 OFF_COUNT=0
 PWR_OFF=false
 MINUTES=5
+INTERUPT_OFFSET=8
+SEC_IN_MIN=60
 
 PWR_NUM=$(cat /proc/interrupts | grep 23: | awk '{printf("%d", $2)}')
 let PWR_COUNT=$PWR_NUM
-echo $PWR_COUNT
+#echo $PWR_COUNT
 while [ "$NEW_NUM" != "TRUE" ]
 do
          PWR_NUM=$(cat /proc/interrupts | grep 23: | awk '{printf("%d", $2)}')
-        echo "POWER:"$(($PWR_NUM - $PWR_COUNT)) 
+        #echo "POWER:"$(($PWR_NUM - $PWR_COUNT)) 
 	if [ $(($PWR_NUM-$PWR_COUNT)) -eq 1 ] # 
  
 	then
 		let PWR_COUNT=$PWR_NUM
 		let PWR_OFF=!$PWR_OFF
-	elif [ $(($PWR_NUM-$PWR_COUNT)) -ge $MINUTES ] 
+	elif [ $(($PWR_NUM-$PWR_COUNT)) -eq $INTERUPT_OFFSET ] 
 	then
 	    echo "DC SUPPLY OFF"
-		let PWR_COUNT=$PWR_NUM
+		#let PWR_COUNT=$PWR_NUM
 		let OFF_COUNT=$(($OFF_COUNT+1))
-		echo "DC POWER off system will go in shutdown in '$OFF_COUNT' min"
-				if [ $OFF_COUNT -ge 6 ]
+		echo "DC POWER off system will go in shut-down in '$(($PWR_COUNT-$OFF_COUNT))' min"
+				if [ $OFF_COUNT -ge $MINUTES ]
 				then
 						 shutdown -h now
-				else
-				   echo "$OFF_CONUT"
 				fi
 	else
 	let PWR_COUNT=$PWR_NUM
+	let OFF_COUNT=0
 	fi
-sleep 60
+sleep $SEC_IN_MIN
 
 done
