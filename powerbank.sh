@@ -41,7 +41,7 @@ do
 	then
 		let PWR_COUNT=$PWR_NUM
 		let PWR_OFF=!$PWR_OFF
-	elif [ $(($PWR_NUM-$PWR_COUNT)) -ge MINUTES ] 
+	elif [ $(($PWR_NUM-$PWR_COUNT)) -ge $MINUTES ] 
 	then
 	    echo "DC SUPPLY OFF"
 		let PWR_COUNT=$PWR_NUM
